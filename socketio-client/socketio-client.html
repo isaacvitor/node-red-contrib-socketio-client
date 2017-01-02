@@ -1,0 +1,81 @@
+<!-- Config -->
+<script type="text/javascript">
+  "use strict";
+  /*global RED*/
+  RED.nodes.registerType('socketio-config', {
+    category: 'config',
+    defaults: {
+      host: {
+        value: "localhost",
+        required: true
+      },
+      port: {
+        value: "",
+        required: false,
+        validate: RED.validators.number()
+      }
+    },
+    label: function() {
+      return this.host + ":" + this.port;
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="socketio-config">
+  <div class="form-row">
+    <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
+    <input type="text" id="node-config-input-host">
+  </div>
+  <div class="form-row">
+    <label for="node-config-input-port"><i class="fa fa-server"></i> Port</label>
+    <input type="text" id="node-config-input-port">
+  </div>
+</script>
+
+<!-- Connector -->
+<script type="text/javascript">
+  /*global RED*/
+  RED.nodes.registerType('socketio-connector', {
+    category: 'input',
+    outputs: 1,
+    color: "#D8BFD8",
+    icon: "socketio.png",
+    paletteLabel: "socketio connector",
+    defaults: {
+      server: {
+        value: "",
+        type: "socketio-config"
+      },
+      namespace: {
+        value: "",
+        required:false
+      },
+      name: {
+        value: ""
+      }
+    },
+    label: function() {
+        return this.name || "Socket.IO Connector";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="socketio-connector">
+  <div class="form-row">
+    <label for="node-input-server"><i class="fa fa-globe"></i> Server</label>
+    <input type="text" id="node-input-server" placeholder="Server">
+  </div>
+  <div class="form-row">
+    <label for="node-input-namespace"><i class="icon-tasks"></i> namespace</label>
+    <input type="text" id="node-input-namespace" placeholder="Namespace">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="socketio-connector">
+  <p>Socket.IO Connector</p>
+</script>
+
