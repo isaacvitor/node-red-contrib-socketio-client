@@ -17,6 +17,7 @@ module.exports = function(RED) {
     this.name = config.name;
     this.event = config.event;
     this.sto = null;
+    this.connections = [];
     var node = this;
 
     this.client = connect(this.server);
@@ -44,10 +45,16 @@ module.exports = function(RED) {
   RED.nodes.registerType('socketio-connector', SocketIOConnector);
 
 
-  function connect(config) {
-    var uri = (config.port != '') ? (config.host + ':' + config.port) : config.host;
-    var server = (config.namespace) ? uri + "/" + config.namespace : uri;
-    var sckt = io( server );
+  function connect(config, force) {
+    var uri = config.host;
+    if(config.port != ''){
+      uri += ':' +  config.port;
+    }else if(config.namespace != ''){
+      uri += ':' +  config.namespace;
+    }
+
+    console.log(uri)
+    var sckt = io.connect( uri );//io( uri );
 
     sckt.on('connect_error', function(err) {
       console.log('[socket.io]', err);
