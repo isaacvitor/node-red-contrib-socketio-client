@@ -1,49 +1,106 @@
 module.exports = function(RED) {
   'use strict';
-  var io = require('socket.io');
+  var io = require('socket.io-client');
 
   /* sckt config */
-  function SocketIOConfig(config) {
-    RED.nodes.createNode(this, config);
-    this.host = config.host;
-    this.port = config.port;
-  }
-  RED.nodes.registerType('socketio-config', SocketIOConfig);
+    function SocketIOConfig(config) {
+      RED.nodes.createNode(this, config);
+      this.host = config.host;
+      this.port = config.port;
+    }
+    RED.nodes.registerType('socketio-config', SocketIOConfig);
 
   /* sckt connector*/
-  function SocketIOConnector(config){
-    RED.nodes.createNode(this, config);
-    this.server = RED.nodes.getNode(config.server);
-    this.name = config.name;
-    this.event = config.event;
-    this.sto = null;
-    this.connections = [];
-    var node = this;
+    function SocketIOConnector(config){
+      RED.nodes.createNode(this, config);
+      this.server = RED.nodes.getNode(config.server);
+      this.name = config.name;
+      this.events = config.events;
+      this.sto = null;
+      var node = this;
 
-    this.client = connect(this.server);
+      this.socket = connect(this.server);
 
-    node.status({fill:"green",shape:"dot",text:"connected"});
+      this.socket.on('connect', function(){
+        /*var connections = [];
+        for(var i=0;i < config.outputs; i++){
+          connections.push({payload:node.socket});
+        }
+        node.send(connections);*/
+        node.send({ payload:{connection:node.socket, status:'connected'} });
 
-    node.on('input', function(msg) {
-      msg.payload = this.client;
-      node.send(msg);
-    });
+        node.status({fill:"green",shape:"dot",text:"connected"});
+      });
 
-    node.on('close', function(done) {
-      node.status({});
-      disconnect(node.server);
-      done();
-    });
+      this.socket.on('disconnect', function(){
+        //node.socket = null;
+        node.send({payload:{connection:null, status:'disconnected'}});
+        node.status({fill:"red",shape:"dot",text:"disconnected"});
+      });
 
-    node.client.on('error', function(err) {
-      if (err) {
-        clearInterval(node.sto);
-        node.error(err);
-      }
-    });  
-  }
-  RED.nodes.registerType('socketio-connector', SocketIOConnector);
+      node.on('close', function(done) {
+        node.status({});
+        node.send({payload:{connection:null, status:'disconnected'}});
+        node.socket = null;
+        disconnect(node.server);
+        done();
+      });
 
+      this.socket.on('connect_error', function(err) {
+        if (err) {
+          node.send({payload:{connection:null, status:'disconnected'}});
+          clearInterval(node.sto);
+          node.error(err);
+        }
+      });  
+    }
+    RED.nodes.registerType('socketio-connector', SocketIOConnector);
+
+  /* sckt listener*/
+    function SocketIOListener(config){
+      RED.nodes.createNode(this, config);
+      this.server = RED.nodes.getNode(config.server);
+      this.name = config.name;
+      this.eventName = config.eventname;
+      this.sto = null;
+      this.connection = null;
+      var node = this;
+
+
+      node.on('input', function(msg) {
+        var pl = msg.payload;
+        //node.connection = null;
+        if(pl.connection){
+          node.connection = pl.connection; 
+          console.log(node.name, node.eventName, node.connection.connected);
+          
+          node.connection.on('connect', function(){
+            node.status({fill:"green",shape:"dot",text:"connected"});
+          });
+
+          node.connection.on('disconnect', function(){
+            node.status({fill:"red",shape:"dot",text:"disconnected"});
+          });
+          console.log('hasListener', node.connection.hasListeners(node.eventName));
+          if(!node.connection.hasListeners(node.eventName)){
+            node.connection.on(node.eventName, function(data){
+              console.log('event', node.name, node.eventName, JSON.stringify(data) );
+              node.send({payload: data});
+            });
+          }
+
+        }else{
+          console.log('', pl)
+          if(!node.connection.hasListeners(node.eventName)){
+            node.connection.removeListener(node.eventName, function(){
+              node.send({payload: null });
+            });
+          }
+          node.connection = null;
+        }
+      });
+    }
+    RED.nodes.registerType('socketio-listener', SocketIOListener);
 
   function connect(config, force) {
     var uri = config.host;
@@ -52,13 +109,8 @@ module.exports = function(RED) {
     }else if(config.namespace != ''){
       uri += ':' +  config.namespace;
     }
+    var sckt = io( uri );
 
-    console.log(uri)
-    var sckt = io.connect( uri );//io( uri );
-
-    sckt.on('connect_error', function(err) {
-      console.log('[socket.io]', err);
-    });
     return sckt;
   }
 

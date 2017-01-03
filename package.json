@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-socketio-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Node Red client to work with socket.io server",
   "main": "index.js",
   "scripts": {
@@ -11,8 +11,7 @@
     "url": "git+https://github.com/isaacvitor/node-red-contrib-socketio-client.git"
   },
   "keywords": [
-    "socket.io",
-    "node"
+    "socket.io"
   ],
   "author": "Isaac Vitor",
   "license": "MIT",
@@ -21,12 +20,11 @@
   },
   "homepage": "https://github.com/isaacvitor/node-red-contrib-socketio-client.git#readme",
   "dependencies": {
-    "socket.io": "^1.7.2"
+    "socket.io-client": "^1.7.2"
   },
-  "keywords": [ "node-red", "socket.io" ],
-  "node-red"     : {
+  "node-red": {
     "nodes": {
-        "socketio-client": "socketio-client/socketio-client.js"
+      "socketio-client": "socketio-client/socketio-client.js"
     }
   }
 }
