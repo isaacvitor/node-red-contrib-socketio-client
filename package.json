@@ -16,7 +16,7 @@
   "author": "Isaac Vitor",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/isaacvitor/node-red-contrib-socketio-client.git/issues"
+    "url": "https://github.com/isaacvitor/node-red-contrib-socketio-client/issues"
   },
   "homepage": "https://github.com/isaacvitor/node-red-contrib-socketio-client.git#readme",
   "dependencies": {
