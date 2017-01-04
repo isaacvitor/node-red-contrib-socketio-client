@@ -37,6 +37,7 @@
     /*global RED*/
     RED.nodes.registerType('socketio-connector', {
       category: 'input',
+      inputs: 0,
       outputs: 1,
       color: "#D8BFD8",
       icon: "socketio.png",
@@ -49,50 +50,14 @@
         namespace: {
           value: "",
           required:false
-        },/*,
-        outputs: {value:1},*/
+        },
         name: {
           value: ""
         }
       },
       label: function() {
           return this.name || "Socket.IO Connector";
-      },
-      oneditprepare: function() {
-        var that = this;
-        /*$( "#node-input-outputs" ).spinner({
-            min:1
-        });*/
-
-        /*this.editor = RED.editor.createEditor({
-            id: 'node-input-func-editor',
-            mode: 'ace/mode/javascript',
-            value: $("#node-input-func").val(),
-            globals: {
-                msg:true,
-                context:true,
-                RED: true,
-                util: true,
-                flow: true,
-                global: true,
-                console: true,
-                Buffer: true,
-                setTimeout: true,
-                clearTimeout: true,
-                setInterval: true,
-                clearInterval: true
-            }
-        });
-
-        RED.library.create({
-            url:"functions", // where to get the data from
-            type:"function", // the type of object the library is for
-            editor:this.editor, // the field name the main text body goes to
-            mode:"ace/mode/javascript",
-            fields:['name','outputs']
-        });
-        this.editor.focus();*/
-      },
+      }
     });
   </script>
 
@@ -105,10 +70,6 @@
       <label for="node-input-namespace"><i class="icon-tasks"></i> namespace</label>
       <input type="text" id="node-input-namespace" placeholder="Namespace">
     </div>
-   <!--  <div class="form-row">
-        <label for="node-input-outputs"><i class="fa fa-random"></i> <span data-i18n="function.label.outputs"></span></label>
-        <input id="node-input-outputs" style="width: 60px;" value="1">
-    </div> -->
     <div class="form-row">
       <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
       <input type="text" id="node-input-name" placeholder="Name">
