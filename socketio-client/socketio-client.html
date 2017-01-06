@@ -78,6 +78,9 @@
 
   <script type="text/x-red" data-help-name="socketio-connector">
     <p>Socket.IO Connector</p>
+    <p>Provides a client for Socket.IO server</p>
+    <p>It's works only in couple with Socket.io Listener, bacause of this its output will be util only to a Socket.io Listener</p>
+    <pre>Socket.IO Connector -> Socket.IO Listener -> Payload</pre>
   </script>
 
 <!-- Listener -->
@@ -118,5 +121,8 @@
 
   <script type="text/x-red" data-help-name="socketio-listener">
       <p>Socket.IO Listener</p>
+      <p>It's works only in couple with Socket.io Connector</p>
+      <pre>Socket.IO Connector -> Socket.IO Listener -> Payload</pre>
+      <p>The <code>msg.payload</code> will be whole content emitted through 'event name' that you specified</p>
   </script>
 

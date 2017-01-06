@@ -43,7 +43,6 @@ module.exports = function(RED) {
 
       this.on('close', function(done) {
         sockets[node.id].disconnect();
-        //delete sockets;
         node.status({});
         done();
       }); 
@@ -60,7 +59,6 @@ module.exports = function(RED) {
       var node = this;
 
       node.on('input', function(msg){
-        //console.log('LISTENER', node.eventName, node.id, node.socketId);
         node.socketId = msg.payload.socketId;
         if(msg.payload.status == 'connected'){
           node.status({fill:'green',shape:'dot',text:'listening'});
@@ -75,13 +73,9 @@ module.exports = function(RED) {
             sockets[node.socketId].removeListener(node.eventName, function(){});
           }
         }
-        //console.log('CALLBACKS', sockets[node.socketId]._callbacks)
       });
 
-      //console.log('hasListeners 02', Object.keys(sockets) )
-
       node.on('close', function(done) {
-        //console.log('REMOVE LISTENER', node.eventName, sockets[node.socketId].hasListeners(node.eventName));
         
         if( sockets[node.socketId].hasListeners(node.eventName) ){
           sockets[node.socketId].removeListener(node.eventName, function(){
@@ -104,13 +98,6 @@ module.exports = function(RED) {
     if(config.port != ''){
       uri += ':' +  config.port;
     } 
-
-    /*if(config.namespace){
-      uri += '/' +  config.namespace;
-      sckt = io.connect( uri );
-    }else{
-      sckt = io( uri );
-    }*/
 
     if(config.namespace){
       uri += '/' +  config.namespace;
