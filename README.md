@@ -16,6 +16,5 @@
 ## ToDo
 
 1. Socket.IO Server
-2. Socket.IO Emmiter
 
 **Notice:** This module are in developing so, take care when to use in production.
