@@ -91,6 +91,24 @@ module.exports = function(RED) {
     }
     RED.nodes.registerType('socketio-listener', SocketIOListener);
 
+  /* sckt emitter*/
+    function SocketIOEmitter(n){
+      RED.nodes.createNode(this, n);
+      this.name = n.name;
+      this.eventName = n.eventname;
+      this.socketId = null;
+
+      var node = this;
+
+      node.on('input', function(msg){
+        node.socketId = msg.payload.socketId;
+
+        sockets[node.socketId].emit(n.name, JSON.parse(n.message || '{}') );
+
+      });
+    }
+    RED.nodes.registerType('socketio-emitter', SocketIOEmitter);
+
   function connect(config, force) {
     var uri = config.host;
     var sckt;
@@ -98,7 +116,6 @@ module.exports = function(RED) {
     if(config.port != ''){
       uri += ':' +  config.port;
     } 
-
     if(config.namespace){
       uri += '/' +  config.namespace;
       sckt = require('socket.io-client').connect( uri );

@@ -126,3 +126,45 @@
       <p>The <code>msg.payload</code> will be whole content emitted through 'event name' that you specified</p>
   </script>
 
+<!-- Emitter -->
+  <script type="text/javascript">
+    /*global RED*/
+    RED.nodes.registerType('socketio-emitter', {
+      category: 'function',
+      inputs: 1,
+      outputs: 0,
+      color: "#D8BFD8",
+      icon: "socketio.png",
+      paletteLabel: "socketio emitter",
+      defaults: {
+        name: {
+          value: ""
+        },
+        message: {
+          value: "{}"
+        }
+      },
+      label: function() {
+          return ( this.name || this.eventname ) || "Socket.IO emitter";
+      }
+    });
+  </script>
+
+  <script type="text/x-red" data-template-name="socketio-emitter">
+    <div class="form-row">
+      <label for="node-input-name"><i class="icon-tasks"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Event Name">
+    </div>
+    <div class="form-row">
+      <label for="node-input-message">Message</label>
+      <input type="text" id="node-input-message" placeholder="message">
+    </div>
+  </script>
+
+  <script type="text/x-red" data-help-name="socketio-emitter">
+      <p>Socket.IO emitter</p>
+      <p>It's works only in couple with Socket.io Connector</p>
+      <pre>Socket.IO Connector -> Socket.IO emitter -> Payload</pre>
+      <p>The <code>msg.payload</code> will be whole content emitted through 'event name' that you specified</p>
+  </script>
+
