@@ -13,6 +13,10 @@
           value: "",
           required: false,
           validate: RED.validators.number()
+        },
+        path: {
+          value: "",
+          required: false
         }
       },
       label: function() {
@@ -29,6 +33,10 @@
     <div class="form-row">
       <label for="node-config-input-port"><i class="fa fa-server"></i> Port</label>
       <input type="text" id="node-config-input-port">
+    </div>
+    <div class="form-row">
+      <label for="node-config-input-path"><i class="fa fa-folder"></i> Path</label>
+      <input type="text" id="node-config-input-path">
     </div>
   </script>
 

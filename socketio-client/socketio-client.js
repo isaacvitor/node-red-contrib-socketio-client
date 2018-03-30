@@ -8,6 +8,7 @@ module.exports = function(RED) {
       RED.nodes.createNode(this, n);
       this.host = n.host;
       this.port = n.port;
+      this.path = n.path;
     }
     RED.nodes.registerType('socketio-config', SocketIOConfig);
 
@@ -112,15 +113,19 @@ module.exports = function(RED) {
   function connect(config, force) {
     var uri = config.host;
     var sckt;
+    var options = {};
 
     if(config.port != ''){
       uri += ':' +  config.port;
-    } 
+    }
+    if(config.path != ''){
+      options.path = config.path;
+    }
     if(config.namespace){
       uri += '/' +  config.namespace;
-      sckt = require('socket.io-client').connect( uri );
+      sckt = require('socket.io-client').connect( uri, options );
     }else{
-      sckt = require('socket.io-client')( uri );
+      sckt = require('socket.io-client')( uri, options );
     }
     return sckt;
   }
