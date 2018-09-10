@@ -103,9 +103,20 @@ module.exports = function(RED) {
 
       node.on('input', function(msg){
         node.socketId = msg.payload.socketId;
+        
+        var emitargs;
 
-        sockets[node.socketId].emit(n.name, JSON.parse(n.message || '{}') );
+        if(n.message === "") {
+          n.message = '{}';
+        }
 
+        try {
+          emitargs = JSON.parse(n.message);
+        } catch (e) {
+          emitargs = n.message;
+        }
+
+        sockets[node.socketId].emit(n.name, emitargs);
       });
     }
     RED.nodes.registerType('socketio-emitter', SocketIOEmitter);
