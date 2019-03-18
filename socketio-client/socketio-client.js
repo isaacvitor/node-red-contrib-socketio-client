@@ -1,6 +1,6 @@
 module.exports = function (RED) {
   'use strict';
-  //var io = require('socket.io-client');
+  let path = reuqire('path');
   let sockets = {};
 
   /* sckt config */
@@ -19,11 +19,9 @@ module.exports = function (RED) {
     this.server = RED.nodes.getNode(n.server);
     this.server.namespace = n.namespace;
     this.name = n.name;
+    this.sockets = sockets;
     let node = this;
 
-    if (sockets[node.name]) {
-      delete sockets[node.name]; 
-    }
     sockets[node.name] = connect(this.server);
 
     sockets[node.name].on('connect', () => {
@@ -44,9 +42,12 @@ module.exports = function (RED) {
       }
     });
 
-    this.on('close', (done) => {
+    this.on('close', (removed, done) => {
       sockets[node.name].disconnect();
       node.status({});
+      if (removed) {
+        delete sockets[node.name];
+      }
       done();
     });
   }
@@ -117,7 +118,6 @@ module.exports = function (RED) {
 
   function connect(config, force) {
     var uri = config.host;
-    var sckt;
     var options = {
       reconnection: config.reconnection
     };
@@ -129,12 +129,9 @@ module.exports = function (RED) {
       options.path = config.path;
     }
     if (config.namespace) {
-      uri += '/' + config.namespace;
-      sckt = require('socket.io-client').connect(uri, options);
-    } else {
-      sckt = require('socket.io-client')(uri, options);
+      uri = path.join(uri, config.namespace);
     }
-    return sckt;
+    return require('socket.io-client').connect(uri, options);
   }
 
   function disconnect(config) {
