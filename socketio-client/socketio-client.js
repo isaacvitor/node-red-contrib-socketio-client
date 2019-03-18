@@ -1,117 +1,119 @@
-module.exports = function(RED) {
+module.exports = function (RED) {
   'use strict';
   //var io = require('socket.io-client');
-  var sockets = {};
+  let sockets = {};
 
   /* sckt config */
-    function SocketIOConfig(n) {
-      RED.nodes.createNode(this, n);
-      this.host = n.host;
-      this.port = n.port;
-      this.path = n.path;
-      this.reconnection = n.reconnection;
-    }
-    RED.nodes.registerType('socketio-config', SocketIOConfig);
+  function SocketIOConfig(n) {
+    RED.nodes.createNode(this, n);
+    this.host = n.host;
+    this.port = n.port;
+    this.path = n.path;
+    this.reconnection = n.reconnection;
+  }
+  RED.nodes.registerType('socketio-config', SocketIOConfig);
 
   /* sckt connector*/
-    function SocketIOConnector(n){
-      RED.nodes.createNode(this, n);
-      this.server = RED.nodes.getNode(n.server);
-      this.server.namespace = n.namespace;
-      this.name = n.name;
-      this.sockets = sockets;
-      var node = this;
-      
-      if(sockets[node.name]){ delete sockets[node.name];}
-      sockets[node.name] = connect(this.server);
-        
-      sockets[node.name].on('connect', function(){
-        node.send({ payload:{socketId: node.name, status:'connected'} });
-        node.status({fill:"green",shape:"dot", text:"connected"});
-      });
+  function SocketIOConnector(n) {
+    RED.nodes.createNode(this, n);
+    this.server = RED.nodes.getNode(n.server);
+    this.server.namespace = n.namespace;
+    this.name = n.name;
+    let node = this;
 
-      sockets[node.name].on('disconnect', function(){
-        node.send({payload:{socketId:node.name, status:'disconnected'}});
-        node.status({fill:'red',shape:'ring', text:'disconnected'});
-      });
-
-      sockets[node.name].on('connect_error', function(err) {
-        if (err) {
-          node.status({fill:'red',shape:'ring',text:'disconnected'});
-          node.send({payload:{socketId: node.name, status:'disconnected'}});
-          //node.error(err);
-        }
-      }); 
-
-      this.on('close', function(done) {
-        sockets[node.name].disconnect();
-        node.status({});
-        done();
-      }); 
+    if (sockets[node.name]) {
+      delete sockets[node.name]; 
     }
-    RED.nodes.registerType('socketio-connector', SocketIOConnector);
+    sockets[node.name] = connect(this.server);
+
+    sockets[node.name].on('connect', () => {
+      node.send({ payload: { socketId: node.name, status: 'connected' } });
+      node.status({ fill: "green", shape: "dot", text: "connected" });
+    });
+
+    sockets[node.name].on('disconnect', () => {
+      node.send({ payload: { socketId: node.name, status: 'disconnected' } });
+      node.status({ fill: 'red', shape: 'ring', text: 'disconnected' });
+    });
+
+    sockets[node.name].on('connect_error', (err) => {
+      if (err) {
+        node.status({ fill: 'red', shape: 'ring', text: 'disconnected' });
+        node.send({ payload: { socketId: node.name, status: 'disconnected' } });
+        //node.error(err);
+      }
+    });
+
+    this.on('close', (done) => {
+      sockets[node.name].disconnect();
+      node.status({});
+      done();
+    });
+  }
+  RED.nodes.registerType('socketio-connector', SocketIOConnector);
 
   /* sckt listener*/
-    function SocketIOListener(n){
-      RED.nodes.createNode(this, n);
-      this.name = n.name;
-      this.eventName = n.eventname;
-      this.socketId = null;
+  function SocketIOListener(n) {
+    RED.nodes.createNode(this, n);
+    this.name = n.name;
+    this.eventName = n.eventname;
+    this.socketId = null;
 
-      var node = this;
+    var node = this;
 
-      node.on('input', function(msg){
-        node.socketId = msg.payload.socketId;
-        if(msg.payload.status == 'connected'){
-          node.status({fill:'green',shape:'dot',text:'listening'});
-          if( !sockets[node.socketId].hasListeners(node.eventName) ){
-            sockets[node.socketId].on(node.eventName, function(data){
-              node.send( {payload:data} );
-            });
-          }
-        }else{
-          node.status({fill:'red',shape:'ring',text:'disconnected'});
-          if( sockets[node.socketId].hasListeners(node.eventName) ){
-            sockets[node.socketId].removeListener(node.eventName, function(){});
-          }
-        }
-      });
-
-      node.on('close', function(done) {
-        
-        if( sockets[node.socketId].hasListeners(node.eventName) ){
-          sockets[node.socketId].removeListener(node.eventName, function(){
-            node.status({});
-            done();
+    node.on('input', (msg) => {
+      node.socketId = msg.payload.socketId;
+      if (msg.payload.status == 'connected') {
+        node.status({ fill: 'green', shape: 'dot', text: 'listening' });
+        if (!sockets[node.socketId].hasListeners(node.eventName)) {
+          sockets[node.socketId].on(node.eventName, function (data) {
+            node.send({ payload: data });
           });
-        }else{
+        }
+      } else {
+        node.status({ fill: 'red', shape: 'ring', text: 'disconnected' });
+        if (sockets[node.socketId].hasListeners(node.eventName)) {
+          sockets[node.socketId].removeListener(node.eventName, function () { });
+        }
+      }
+    });
+
+    node.on('close', (done) => {
+      if (sockets[node.socketId].hasListeners(node.eventName)) {
+        sockets[node.socketId].removeListener(node.eventName, function () {
           node.status({});
           done();
-        }
-            
-      }); 
-    }
-    RED.nodes.registerType('socketio-listener', SocketIOListener);
+        });
+      } else {
+        node.status({});
+        done();
+      }
+    });
+  }
+  RED.nodes.registerType('socketio-listener', SocketIOListener);
 
   /* sckt emitter*/
-    function SocketIOEmitter(n){
-      RED.nodes.createNode(this, n);
-      this.name = n.name;
-      this.socketId = null;
+  function SocketIOEmitter(n) {
+    RED.nodes.createNode(this, n);
+    this.name = n.name;
+    this.socketId = null;
 
-      var node = this;
+    let node = this;
 
-      node.on('input', function(msg){
-        if (!msg.connectionName) {
-          throw 'msg.connectionName undefined! Please place connectionName to msg object';
-        }
-        if (!msg.eventName) {
-          throw 'msg.eventName undefined! Please place eventName to msg object';
-        }
-        sockets[msg.connectionName].emit(msg.eventName, n.payload);
-      });
-    }
-    RED.nodes.registerType('socketio-emitter', SocketIOEmitter);
+    node.on('input', (msg) => {
+      if (!msg.connectionName) {
+        throw 'msg.connectionName undefined! Please place connectionName to msg object';
+      }
+      if (!msg.eventName) {
+        throw 'msg.eventName undefined! Please place eventName to msg object';
+      }
+      if (!sockets[msg.connectionName]) {
+        throw 'Connection ' + msg.connectionName + ' not exists';
+      }
+      sockets[msg.connectionName].emit(msg.eventName, n.payload);
+    });
+  }
+  RED.nodes.registerType('socketio-emitter', SocketIOEmitter);
 
   function connect(config, force) {
     var uri = config.host;
@@ -120,17 +122,17 @@ module.exports = function(RED) {
       reconnection: config.reconnection
     };
 
-    if(config.port != ''){
-      uri += ':' +  config.port;
+    if (config.port != '') {
+      uri += ':' + config.port;
     }
-    if(config.path != ''){
+    if (config.path != '') {
       options.path = config.path;
     }
-    if(config.namespace){
-      uri += '/' +  config.namespace;
-      sckt = require('socket.io-client').connect( uri, options );
-    }else{
-      sckt = require('socket.io-client')( uri, options );
+    if (config.namespace) {
+      uri += '/' + config.namespace;
+      sckt = require('socket.io-client').connect(uri, options);
+    } else {
+      sckt = require('socket.io-client')(uri, options);
     }
     return sckt;
   }
