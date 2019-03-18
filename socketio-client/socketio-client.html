@@ -65,20 +65,7 @@
         },
         name: {
           value: "",
-          validate: function(v) {
-            if (!RED.validators.regex(/[a-zA-Z0-9_]+/)(v)) {
-              return false;
-            }
-            console.log(this.sockets, v, this);
-            if (this.sockets && this.sockets[v]) {
-              $('#node-input-name').parent().addClass('has-error');
-              $('#node-input-name').parent().find('.help-block').show();
-              return false;
-            }
-            $('#node-input-name').parent().removeClass('has-error');
-            $('#node-input-name').parent().find('.help-block').hide();
-            return true;
-          },
+          validate: RED.validators.regex(/[a-zA-Z0-9_]+/),
           required: true
         }
       },

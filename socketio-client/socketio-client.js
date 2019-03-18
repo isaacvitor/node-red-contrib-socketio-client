@@ -111,7 +111,7 @@ module.exports = function (RED) {
       if (!sockets[msg.connectionName]) {
         throw 'Connection ' + msg.connectionName + ' not exists';
       }
-      sockets[msg.connectionName].emit(msg.eventName, n.payload);
+      sockets[msg.connectionName].emit(msg.eventName, msg.payload);
     });
   }
   RED.nodes.registerType('socketio-emitter', SocketIOEmitter);
