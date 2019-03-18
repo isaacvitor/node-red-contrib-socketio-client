@@ -71,9 +71,11 @@
             }
             if (this.sockets[v]) {
               $('#node-input-name').parent().addClass('has-error');
+              $('#node-input-name').parent().find('.help-block').show();
               return false;
             }
             $('#node-input-name').parent().removeClass('has-error');
+            $('#node-input-name').parent().find('.help-block').hide();
             return true;
           },
           required: true

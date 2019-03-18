@@ -22,29 +22,29 @@ module.exports = function(RED) {
       this.sockets = sockets;
       var node = this;
       
-      if(sockets[this.name]){ delete sockets[this.name];}
-      sockets[this.name] = connect(this.server);
+      if(sockets[node.name]){ delete sockets[node.name];}
+      sockets[node.name] = connect(this.server);
         
-      sockets[this.name].on('connect', function(){
-        node.send({ payload:{socketId:this.name, status:'connected'} });
+      sockets[node.name].on('connect', function(){
+        node.send({ payload:{socketId: node.name, status:'connected'} });
         node.status({fill:"green",shape:"dot", text:"connected"});
       });
 
-      sockets[this.name].on('disconnect', function(){
-        node.send({payload:{socketId:this.name, status:'disconnected'}});
+      sockets[node.name].on('disconnect', function(){
+        node.send({payload:{socketId:node.name, status:'disconnected'}});
         node.status({fill:'red',shape:'ring', text:'disconnected'});
       });
 
-      sockets[this.name].on('connect_error', function(err) {
+      sockets[node.name].on('connect_error', function(err) {
         if (err) {
           node.status({fill:'red',shape:'ring',text:'disconnected'});
-          node.send({payload:{socketId:this.name, status:'disconnected'}});
+          node.send({payload:{socketId: node.name, status:'disconnected'}});
           //node.error(err);
         }
       }); 
 
       this.on('close', function(done) {
-        sockets[this.name].disconnect();
+        sockets[node.name].disconnect();
         node.status({});
         done();
       }); 
