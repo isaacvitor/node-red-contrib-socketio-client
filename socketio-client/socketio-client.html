@@ -17,6 +17,10 @@
         path: {
           value: "",
           required: false
+        },
+        reconnection: {
+          value: true,
+          required: false
         }
       },
       label: function() {
@@ -57,10 +61,22 @@
         },
         namespace: {
           value: "",
-          required:false
+          required: false
         },
         name: {
-          value: ""
+          value: "",
+          validate: function(v) {
+            if (!RED.validators.regex(/[a-zA-Z0-9_]+/)(v)) {
+              return false;
+            }
+            if (this.sockets[v]) {
+              $('#node-input-name').parent().addClass('has-error');
+              return false;
+            }
+            $('#node-input-name').parent().removeClass('has-error');
+            return true;
+          },
+          required: true
         }
       },
       label: function() {
@@ -81,6 +97,7 @@
     <div class="form-row">
       <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
       <input type="text" id="node-input-name" placeholder="Name">
+      <span class="help-block hidden">Connection name already used in flows</span>
     </div>
   </script>
 
@@ -88,6 +105,7 @@
     <p>Socket.IO Connector</p>
     <p>Provides a client for Socket.IO server</p>
     <p>It's works only in couple with Socket.io Listener, bacause of this its output will be util only to a Socket.io Listener</p>
+    <p>Connection Name used by Socket.IO Emmiter</p>
     <pre>Socket.IO Connector -> Socket.IO Listener -> Payload</pre>
   </script>
 
@@ -147,13 +165,10 @@
       defaults: {
         name: {
           value: ""
-        },
-        message: {
-          value: "{}"
         }
       },
       label: function() {
-          return ( this.name || this.eventname ) || "Socket.IO emitter";
+          return ( this.name ) || "Socket.IO emitter";
       }
     });
   </script>
@@ -163,16 +178,20 @@
       <label for="node-input-name"><i class="icon-tasks"></i> Name</label>
       <input type="text" id="node-input-name" placeholder="Event Name">
     </div>
-    <div class="form-row">
-      <label for="node-input-message">Message</label>
-      <input type="text" id="node-input-message" placeholder="message">
-    </div>
   </script>
 
   <script type="text/x-red" data-help-name="socketio-emitter">
       <p>Socket.IO emitter</p>
-      <p>It's works only in couple with Socket.io Connector</p>
-      <pre>Socket.IO Connector -> Socket.IO emitter -> Payload</pre>
-      <p>The <code>msg.payload</code> will be whole content emitted through 'event name' that you specified</p>
+      <p>Use payload as what you want to send, also you need set msg.connectionName and msg.eventName</p>
+      <pre>
+        {
+          connectionName: 'connection1',
+          eventName: 'MySocketIOEvent',
+          payload: {
+            cmd: 'hello',
+            message: 'World'
+          }
+        }
+      </pre>
   </script>
 

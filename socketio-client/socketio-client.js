@@ -9,6 +9,7 @@ module.exports = function(RED) {
       this.host = n.host;
       this.port = n.port;
       this.path = n.path;
+      this.reconnection = n.reconnection;
     }
     RED.nodes.registerType('socketio-config', SocketIOConfig);
 
@@ -18,32 +19,32 @@ module.exports = function(RED) {
       this.server = RED.nodes.getNode(n.server);
       this.server.namespace = n.namespace;
       this.name = n.name;
+      this.sockets = sockets;
       var node = this;
-
       
-      if(sockets[node.id]){ delete sockets[node.id];}
-      sockets[node.id] = connect(this.server);
+      if(sockets[this.name]){ delete sockets[this.name];}
+      sockets[this.name] = connect(this.server);
         
-      sockets[node.id].on('connect', function(){
-        node.send({ payload:{socketId:node.id, status:'connected'} });
+      sockets[this.name].on('connect', function(){
+        node.send({ payload:{socketId:this.name, status:'connected'} });
         node.status({fill:"green",shape:"dot", text:"connected"});
       });
 
-      sockets[node.id].on('disconnect', function(){
-        node.send({payload:{socketId:node.id, status:'disconnected'}});
+      sockets[this.name].on('disconnect', function(){
+        node.send({payload:{socketId:this.name, status:'disconnected'}});
         node.status({fill:'red',shape:'ring', text:'disconnected'});
       });
 
-      sockets[node.id].on('connect_error', function(err) {
+      sockets[this.name].on('connect_error', function(err) {
         if (err) {
           node.status({fill:'red',shape:'ring',text:'disconnected'});
-          node.send({payload:{socketId:node.id, status:'disconnected'}});
+          node.send({payload:{socketId:this.name, status:'disconnected'}});
           //node.error(err);
         }
       }); 
 
       this.on('close', function(done) {
-        sockets[node.id].disconnect();
+        sockets[this.name].disconnect();
         node.status({});
         done();
       }); 
@@ -96,27 +97,18 @@ module.exports = function(RED) {
     function SocketIOEmitter(n){
       RED.nodes.createNode(this, n);
       this.name = n.name;
-      this.eventName = n.eventname;
       this.socketId = null;
 
       var node = this;
 
       node.on('input', function(msg){
-        node.socketId = msg.payload.socketId;
-        
-        var emitargs;
-
-        if(n.message === "") {
-          n.message = '{}';
+        if (!msg.connectionName) {
+          throw 'msg.connectionName undefined! Please place connectionName to msg object';
         }
-
-        try {
-          emitargs = JSON.parse(n.message);
-        } catch (e) {
-          emitargs = n.message;
+        if (!msg.eventName) {
+          throw 'msg.eventName undefined! Please place eventName to msg object';
         }
-
-        sockets[node.socketId].emit(n.name, emitargs);
+        sockets[msg.connectionName].emit(msg.eventName, n.payload);
       });
     }
     RED.nodes.registerType('socketio-emitter', SocketIOEmitter);
@@ -124,7 +116,9 @@ module.exports = function(RED) {
   function connect(config, force) {
     var uri = config.host;
     var sckt;
-    var options = {};
+    var options = {
+      reconnection: config.reconnection
+    };
 
     if(config.port != ''){
       uri += ':' +  config.port;
