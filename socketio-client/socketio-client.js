@@ -1,6 +1,6 @@
 module.exports = function (RED) {
   'use strict';
-  let path = reuqire('path');
+  let path = require('path');
   let sockets = {};
 
   /* sckt config */
