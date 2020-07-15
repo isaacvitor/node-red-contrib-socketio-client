@@ -81,14 +81,10 @@ module.exports = function (RED) {
 
     node.on('close', (done) => {
       if (sockets[node.socketId].hasListeners(node.eventName)) {
-        sockets[node.socketId].removeListener(node.eventName, function () {
-          node.status({});
-          done();
-        });
-      } else {
-        node.status({});
-        done();
+        sockets[node.socketId].removeListener(node.eventName);
       }
+      node.status({});
+      done();
     });
   }
   RED.nodes.registerType('socketio-listener', SocketIOListener);
