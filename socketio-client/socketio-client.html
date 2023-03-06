@@ -7,12 +7,12 @@
       defaults: {
         host: {
           value: "http://localhost",
-          required: true
+          required: true,
         },
         port: {
           value: "",
           required: false,
-          validate: RED.validators.number()
+          validate: RED.validators.regex(/^(\s*|\d+)$/)
         },
         path: {
           value: "",
@@ -21,26 +21,35 @@
         reconnection: {
           value: true,
           required: false
+        },
+        token:{
+          value: "",
+          required: false,
         }
       },
       label: function() {
         return this.host + ":" + this.port + this.path;
       }
     });
+
   </script>
 
   <script type="text/x-red" data-template-name="socketio-config">
     <div class="form-row">
       <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
-      <input type="text" id="node-config-input-host">
+      <input type="text" id="node-config-input-host" placeholder="e.g. http://127.0.0.1/">
     </div>
     <div class="form-row">
       <label for="node-config-input-port"><i class="fa fa-server"></i> Port</label>
-      <input type="text" id="node-config-input-port">
+      <input type="text" id="node-config-input-port" placeholder="May not be required e.g 8080">
     </div>
     <div class="form-row">
       <label for="node-config-input-path"><i class="fa fa-folder"></i> Path</label>
-      <input type="text" id="node-config-input-path">
+      <input type="text" id="node-config-input-path" placeholder="May not be required e.g /socket.io/">
+    </div>
+    <div class="form-row">
+      <label for="node-config-input-token"><i class="fa fa-key"></i> JWT Token</label>
+      <textarea type="text" id="node-config-input-token" style="width: 70%;height: 100px;"></textarea>
     </div>
   </script>
 
@@ -48,7 +57,7 @@
   <script type="text/javascript">
     /*global RED*/
     RED.nodes.registerType('socketio-connector', {
-      category: 'input',
+      category: 'socket io client',
       inputs: 0,
       outputs: 1,
       color: "#D8BFD8",
@@ -103,7 +112,7 @@
   <script type="text/javascript">
     /*global RED*/
     RED.nodes.registerType('socketio-listener', {
-      category: 'function',
+      category: 'socket io client',
       inputs: 1,
       outputs: 1,
       color: "#D8BFD8",
@@ -146,7 +155,7 @@
   <script type="text/javascript">
     /*global RED*/
     RED.nodes.registerType('socketio-emitter', {
-      category: 'function',
+      category: 'socket io client',
       inputs: 1,
       outputs: 0,
       color: "#D8BFD8",
@@ -184,4 +193,49 @@
         }
       </pre>
   </script>
+
+  
+<!-- Emitter with callback -->
+<script type="text/javascript">
+  /*global RED*/
+  RED.nodes.registerType('socketio-callback-emitter', {
+    category: 'socket io client',
+    inputs: 1,
+    outputs: 1,
+    color: "#D8BFD8",
+    icon: "socketio.png",
+    paletteLabel: "socketio callback emitter",
+    defaults: {
+      name: {
+        value: ""
+      }
+    },
+    label: function() {
+        return ( this.name ) || "Socket.IO callback emitter";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="socketio-callback-emitter">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tasks"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Event Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="socketio-callback-emitter">
+    <p>Socket.IO callback emitter</p>
+    <p>Use payload as what you want to send, also you need set msg.connectionName and msg.eventName</p>
+    <pre>
+      {
+        connectionName: 'connection1',
+        eventName: 'MySocketIOEvent',
+        payload: {
+          cmd: 'hello',
+          message: 'World'
+        }
+      }
+    </pre>
+</script>
+
 

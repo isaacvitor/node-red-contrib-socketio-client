@@ -9,6 +9,7 @@ module.exports = function (RED) {
     this.host = n.host;
     this.port = n.port;
     this.path = n.path;
+    this.token = n.token;
     this.reconnection = n.reconnection;
   }
   RED.nodes.registerType('socketio-config', SocketIOConfig);
@@ -112,10 +113,44 @@ module.exports = function (RED) {
   }
   RED.nodes.registerType('socketio-emitter', SocketIOEmitter);
 
+  /* sckt callback emitter*/
+  function SocketIOCallbackEmitter(n) {
+  RED.nodes.createNode(this, n);
+  this.name = n.name;
+  this.socketId = null;
+
+  let node = this;
+
+  node.on('input', async (msg) => {
+    if (!msg.connectionName) {
+      throw 'msg.connectionName undefined! Please place connectionName to msg object';
+    }
+    if (!msg.eventName) {
+      throw 'msg.eventName undefined! Please place eventName to msg object';
+    }
+    if (!sockets[msg.connectionName]) {
+      throw 'Connection ' + msg.connectionName + ' not exists';
+    }
+    sockets[msg.connectionName].emit(msg.eventName, msg.payload, (response) => {
+      console.log('callback received');
+      node.send({ payload: response });
+    });
+    
+  });
+}
+RED.nodes.registerType('socketio-callback-emitter', SocketIOCallbackEmitter);
+
   function connect(config, force) {
     var uri = config.host;
     var options = {
-      reconnection: config.reconnection
+      reconnection: config.reconnection,
+      transports: ['websocket'],
+      extraHeaders: {
+          "Access-Control-Allow-Origin": config.host,
+      },
+      auth: {
+          token: config.token
+      }
     };
 
     if (config.port != '') {
@@ -127,6 +162,7 @@ module.exports = function (RED) {
     if (config.namespace) {
       uri = path.join(uri, config.namespace);
     }
+
     return require('socket.io-client').connect(uri, options);
   }
 
