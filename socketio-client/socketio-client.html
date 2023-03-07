@@ -37,7 +37,7 @@
   <script type="text/x-red" data-template-name="socketio-config">
     <div class="form-row">
       <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
-      <input type="text" id="node-config-input-host" placeholder="e.g. http://127.0.0.1/">
+      <input type="text" id="node-config-input-host" placeholder="e.g. http://127.0.0.1">
     </div>
     <div class="form-row">
       <label for="node-config-input-port"><i class="fa fa-server"></i> Port</label>
@@ -207,7 +207,12 @@
     paletteLabel: "socketio callback emitter",
     defaults: {
       name: {
-        value: ""
+        value: "",
+        required: true
+      },
+      connection: {
+        value: "",
+        required: true
       }
     },
     label: function() {
@@ -218,23 +223,23 @@
 
 <script type="text/x-red" data-template-name="socketio-callback-emitter">
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tasks"></i> Name</label>
+    <label for="node-input-name"><i class="icon-tasks"></i> Event Name</label>
     <input type="text" id="node-input-name" placeholder="Event Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-connection"><i class="icon-tasks"></i> Connection Name</label>
+    <input type="text" id="node-input-connection" placeholder="Connection Name">
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="socketio-callback-emitter">
     <p>Socket.IO callback emitter</p>
-    <p>Use payload as what you want to send, also you need set msg.connectionName and msg.eventName</p>
+    <p>Use payload as what you want to send</p>
     <pre>
-      {
-        connectionName: 'connection1',
-        eventName: 'MySocketIOEvent',
         payload: {
           cmd: 'hello',
           message: 'World'
         }
-      }
     </pre>
 </script>
 

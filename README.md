@@ -5,6 +5,8 @@
 
 1. Socket.IO Connector
 2. Socket.IO Listener
+3. Socket.IO Emitter
+4. Socket.IO Emitter With Callback
 
 ## How to use
 

@@ -117,22 +117,16 @@ module.exports = function (RED) {
   function SocketIOCallbackEmitter(n) {
   RED.nodes.createNode(this, n);
   this.name = n.name;
+  this.connection = n.connection;
   this.socketId = null;
 
   let node = this;
 
   node.on('input', async (msg) => {
-    if (!msg.connectionName) {
-      throw 'msg.connectionName undefined! Please place connectionName to msg object';
+    if (!sockets[node.connection]) {
+      throw 'Connection ' + node.connection + ' not exists';
     }
-    if (!msg.eventName) {
-      throw 'msg.eventName undefined! Please place eventName to msg object';
-    }
-    if (!sockets[msg.connectionName]) {
-      throw 'Connection ' + msg.connectionName + ' not exists';
-    }
-    sockets[msg.connectionName].emit(msg.eventName, msg.payload, (response) => {
-      console.log('callback received');
+    sockets[node.connection].emit(node.name, msg.payload, (response) => {
       node.send({ payload: response });
     });
     
@@ -144,12 +138,9 @@ RED.nodes.registerType('socketio-callback-emitter', SocketIOCallbackEmitter);
     var uri = config.host;
     var options = {
       reconnection: config.reconnection,
-      transports: ['websocket'],
-      extraHeaders: {
-          "Access-Control-Allow-Origin": config.host,
-      },
       auth: {
-          token: config.token
+          token: config.token,
+          server: true
       }
     };
 
