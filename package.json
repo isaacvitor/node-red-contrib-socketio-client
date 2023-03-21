@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-socketio-client-jwt",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "Node Red client to work with socket.io server with JWT option",
   "main": "index.js",
   "scripts": {
