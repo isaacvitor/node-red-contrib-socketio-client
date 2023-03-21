@@ -4,7 +4,7 @@ module.exports = function (RED) {
   let sockets = {};
 
   /* sckt config */
-  function SocketIOConfig(n) {
+  function SocketIOClientConfig(n) {
     RED.nodes.createNode(this, n);
     this.host = n.host;
     this.port = n.port;
@@ -12,7 +12,7 @@ module.exports = function (RED) {
     this.token = n.token;
     this.reconnection = n.reconnection;
   }
-  RED.nodes.registerType('socketio-config', SocketIOConfig);
+  RED.nodes.registerType('socketio-client-config', SocketIOClientConfig);
 
   /* sckt connector*/
   function SocketIOConnector(n) {

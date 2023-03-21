@@ -1,5 +1,8 @@
 # node-red-contrib-socketio-client
 ---
+## Latest Features
+ - Removed Conflicts with node-red-contrib-socketio-extended for server integrations
+
 
 ## Nodes
 
