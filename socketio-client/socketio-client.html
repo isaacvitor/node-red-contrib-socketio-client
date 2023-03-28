@@ -151,6 +151,100 @@
       <p>The <code>msg.payload</code> will be whole content emitted through 'event name' that you specified</p>
   </script>
 
+
+<!-- Listener In -->
+<script type="text/javascript">
+  /*global RED*/
+  RED.nodes.registerType('socketio-listener-in', {
+    category: 'socket io client',
+    inputs: 1,
+    outputs: 1,
+    color: "#8cb7c5",
+    icon: "socketio.png",
+    paletteLabel: "socketio listener in",
+    defaults: {
+      eventname: {
+        value: "",
+        required: true
+      },
+      name: {
+        value: ""
+      }
+    },
+    label: function() {
+        return ( this.name || this.eventname ) || "Socket.IO listener in";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="socketio-listener-in">
+  <div class="form-row">
+    <label for="node-input-eventname"><i class="icon-tasks"></i> Event Name</label>
+    <input type="text" id="node-input-eventname" placeholder="Event Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="socketio-listener-in">
+    <p>Socket.IO Listener In</p>
+    <p>It's works only in couple with Socket.io Connector</p>
+    <pre>Socket.IO Connector -> Socket.IO Listener In -> Payload -> Socket.IO Listener Callback Out</pre>
+    <p>The <code>msg.payload</code> will be whole content emitted through 'event name' that you specified</p>
+</script>
+
+
+<!-- Listener Callback Out -->
+<script type="text/javascript">
+  /*global RED*/
+  RED.nodes.registerType('socketio-listener-out', {
+    category: 'socket io client',
+    inputs: 1,
+    outputs: 0,
+    color: "#8cb7c5",
+    icon: "socketio.png",
+    paletteLabel: "socketio listener out",
+    defaults: {
+      eventname: {
+        value: "",
+        required: true
+      },
+      name: {
+        value: ""
+      }
+    },
+    label: function() {
+        return ( this.name || this.eventname ) || "Socket.IO listener out";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="socketio-listener-out">
+  <div class="form-row">
+    <label for="node-input-eventname"><i class="icon-tasks"></i> Event Name</label>
+    <input type="text" id="node-input-eventname" placeholder="Event Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="socketio-listener-out">
+    <p>Socket.IO Listener Callback Out</p>
+    <p>It's works only in couple with Socket.io Connector and listener In</p>
+    <pre>Socket.IO Connector -> Socket.IO Listener In -> Payload -> Socket.IO Listener Out</pre>
+    <pre>
+      msg.callback: "your message or object";
+    </pre>
+
+  msg.callback
+
+  </script>
+
+
 <!-- Emitter -->
   <script type="text/javascript">
     /*global RED*/
@@ -202,7 +296,7 @@
     category: 'socket io client',
     inputs: 1,
     outputs: 1,
-    color: "#D8BFD8",
+    color: "#8cb7c5",
     icon: "socketio.png",
     paletteLabel: "socketio callback emitter",
     defaults: {
@@ -242,5 +336,3 @@
         }
     </pre>
 </script>
-
-

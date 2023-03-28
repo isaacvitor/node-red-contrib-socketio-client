@@ -2,6 +2,7 @@ module.exports = function (RED) {
   'use strict';
   let path = require('path');
   let sockets = {};
+  var callbacks = [];
 
   /* sckt config */
   function SocketIOClientConfig(n) {
@@ -90,6 +91,69 @@ module.exports = function (RED) {
   }
   RED.nodes.registerType('socketio-listener', SocketIOListener);
 
+  /* sckt listener in*/
+  function SocketIOListenerIn(n) {
+    RED.nodes.createNode(this, n);
+    this.name = n.name;
+    this.eventName = n.eventname;
+    this.socketId = null;
+
+    var node = this;
+
+    node.on('input', (msg) => {
+      node.socketId = msg.payload.socketId;
+      if (msg.payload.status == 'connected') {
+        node.status({ fill: 'green', shape: 'dot', text: 'listening' });
+        if (!sockets[node.socketId].hasListeners(node.eventName)) {
+          sockets[node.socketId].on(node.eventName, (args, callback) => {
+            callbacks[node.eventName] = callback;
+            //callback("hello there");
+            node.send({ payload: args });
+            
+          });
+        }
+      } else {
+        node.status({ fill: 'red', shape: 'ring', text: 'disconnected' });
+        if (sockets[node.socketId].hasListeners(node.eventName)) {
+          sockets[node.socketId].removeListener(node.eventName, function () { });
+        }
+      }
+    });
+
+    node.on('close', (done) => {
+      if (sockets[node.socketId].hasListeners(node.eventName)) {
+        sockets[node.socketId].removeListener(node.eventName);
+      }
+      node.status({});
+      done();
+    });
+
+  }
+  RED.nodes.registerType('socketio-listener-in', SocketIOListenerIn);
+
+  /* sckt listener out*/
+  function SocketIOListenerOut(n) {
+    RED.nodes.createNode(this, n);
+    this.name = n.name;
+    this.eventName = n.eventname;
+    this.socketId = null;
+    var node = this;
+
+    node.on('input', (msg) => {
+      // unknown issue valueof works fine, but throws console error. 
+      let message =  msg.callback.valueOf();
+      if( callbacks[node.eventName] !== undefined ) {
+        callbacks[node.eventName](message);
+        node.status({ fill: 'green', shape: 'ring', text: 'Callback Sent' });
+      }else{
+        node.status({ fill: 'red', shape: 'ring', text: 'Event name must match listener in' });
+      }
+
+    });
+  }
+  RED.nodes.registerType('socketio-listener-out', SocketIOListenerOut);
+
+
   /* sckt emitter*/
   function SocketIOEmitter(n) {
     RED.nodes.createNode(this, n);
@@ -115,24 +179,25 @@ module.exports = function (RED) {
 
   /* sckt callback emitter*/
   function SocketIOCallbackEmitter(n) {
-  RED.nodes.createNode(this, n);
-  this.name = n.name;
-  this.connection = n.connection;
-  this.socketId = null;
+    RED.nodes.createNode(this, n);
+    this.name = n.name;
+    this.connection = n.connection;
+    this.socketId = null;
 
-  let node = this;
+    let node = this;
 
-  node.on('input', async (msg) => {
-    if (!sockets[node.connection]) {
-      throw 'Connection ' + node.connection + ' not exists';
-    }
-    sockets[node.connection].emit(node.name, msg.payload, (response) => {
-      node.send({ payload: response });
+    node.on('input', async (msg) => {
+      if (!sockets[node.connection]) {
+        throw 'Connection ' + node.connection + ' not exists';
+      }
+      sockets[node.connection].emit(node.name, msg.payload, (response) => {
+        node.status({ fill: 'green', shape: 'ring', text: 'Received Response' });
+        node.send({ payload: response });
+      });
+      
     });
-    
-  });
-}
-RED.nodes.registerType('socketio-callback-emitter', SocketIOCallbackEmitter);
+  }
+  RED.nodes.registerType('socketio-callback-emitter', SocketIOCallbackEmitter);
 
   function connect(config, force) {
     var uri = config.host;
@@ -158,5 +223,9 @@ RED.nodes.registerType('socketio-callback-emitter', SocketIOCallbackEmitter);
   }
 
   function disconnect(config) {
+
   }
+
+
+
 }

@@ -1,15 +1,18 @@
 # node-red-contrib-socketio-client
 ---
 ## Latest Features
- - Removed Conflicts with node-red-contrib-socketio-extended for server integrations
-
+ - Removed Conflicts with node-red-contrib-socketio-extended for server integrations.
+ - Added two listener nodes listener in and listener out for use with callback.
+ - Colour coded call back nodes.
 
 ## Nodes
 
 1. Socket.IO Connector
 2. Socket.IO Listener
 3. Socket.IO Emitter
-4. Socket.IO Emitter With Callback
+4. Socket.IO Emitter with Callback
+5. Socket.IO Listener in, for use with callback listener out
+6. Socket.IO Listener out, for use with callback listener in
 
 ## How to use
 
