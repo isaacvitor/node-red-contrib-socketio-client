@@ -15,11 +15,16 @@
 6. Socket.IO Listener out, for use with callback listener in
 
 ## How to use
+Original Listener:
 
 > Socket.IO Connector -> Socket.IO Listener -> Payload
 
 ![How to use](https://raw.githubusercontent.com/isaacvitor/generalcontent/master/node-red-contrib-socketio-client/nodered_socketio_ex01.png "How to use")
 
+Listener with callback:
+
+> Socket.IO Connector -> Socket.IO Listener In -> Payload -> Socket.IO Listener Out
+![How to use](https://raw.githubusercontent.com/nateainsworth/Git-docs-images/master/node-red-contrib-socketio-client/listener%20with%20callback.png "How to use")
 
 ## ToDo
 
