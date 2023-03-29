@@ -192,7 +192,6 @@
     <p>Socket.IO Listener In</p>
     <p>It's works only in couple with Socket.io Connector</p>
     <pre>Socket.IO Connector -> Socket.IO Listener In -> Payload -> Socket.IO Listener Callback Out</pre>
-    <p>The <code>msg.payload</code> will be whole content emitted through 'event name' that you specified</p>
 </script>
 
 
@@ -236,9 +235,7 @@
     <p>Socket.IO Listener Callback Out</p>
     <p>It's works only in couple with Socket.io Connector and listener In</p>
     <pre>Socket.IO Connector -> Socket.IO Listener In -> Payload -> Socket.IO Listener Out</pre>
-    <pre>
-      msg.callback: "your message or object";
-    </pre>
+    <code>msg.callback: "your message or object";</code>
 
   msg.callback
 

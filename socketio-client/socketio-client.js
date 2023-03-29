@@ -144,7 +144,7 @@ module.exports = function (RED) {
       let message =  msg.callback.valueOf();
       if( callbacks[node.eventName] !== undefined ) {
         callbacks[node.eventName](message);
-        node.status({ fill: 'green', shape: 'ring', text: 'Callback Sent' });
+        node.status({ fill: 'green', shape: 'ring', text: 'Callback Sent' + message });
       }else{
         node.status({ fill: 'red', shape: 'ring', text: 'Event name must match listener in' });
       }
