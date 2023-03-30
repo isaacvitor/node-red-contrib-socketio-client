@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nateainsworth/node-red-contrib-socketio-client.git"
+    "url": "git+https://github.com/isaacvitor/node-red-contrib-socketio-client.git"
   },
   "keywords": [
     "node-red",
@@ -17,9 +17,9 @@
   "author": "Isaac Vitor",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nateainsworth/node-red-contrib-socketio-client/issues"
+    "url": "https://github.com/isaacvitor/node-red-contrib-socketio-client/issues"
   },
-  "homepage": "https://github.com/nateainsworth/node-red-contrib-socketio-client#readme",
+  "homepage": "https://github.com/isaacvitor/node-red-contrib-socketio-client.git#readme",
   "dependencies": {
     "socket.io-client": "^4.6.1"
   },
