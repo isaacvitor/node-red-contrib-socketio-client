@@ -23,7 +23,7 @@ Original Listener:
 Listener with callback:
 
 > Socket.IO Connector -> Socket.IO Listener In -> Payload -> Socket.IO Listener Out
-![How to use](https://raw.githubusercontent.com/isaacvitor/generalcontent/master/node-red-contrib-socketio-client/listener_with_callback.png "How to use")
+![How to use](https://raw.githubusercontent.com/isaacvitor/node-red-contrib-socketio-client/master/listener_with_callback.png "How to use")
 
 ## ToDo
 
