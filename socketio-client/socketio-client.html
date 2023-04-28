@@ -2,17 +2,17 @@
   <script type="text/javascript">
     "use strict";
     /*global RED*/
-    RED.nodes.registerType('socketio-config', {
+    RED.nodes.registerType('socketio-client-config', {
       category: 'config',
       defaults: {
         host: {
           value: "http://localhost",
-          required: true
+          required: true,
         },
         port: {
           value: "",
           required: false,
-          validate: RED.validators.number()
+          validate: RED.validators.regex(/^(\s*|\d+)$/)
         },
         path: {
           value: "",
@@ -21,26 +21,35 @@
         reconnection: {
           value: true,
           required: false
+        },
+        token:{
+          value: "",
+          required: false,
         }
       },
       label: function() {
         return this.host + ":" + this.port + this.path;
       }
     });
+
   </script>
 
-  <script type="text/x-red" data-template-name="socketio-config">
+  <script type="text/x-red" data-template-name="socketio-client-config">
     <div class="form-row">
       <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
-      <input type="text" id="node-config-input-host">
+      <input type="text" id="node-config-input-host" placeholder="e.g. http://127.0.0.1">
     </div>
     <div class="form-row">
       <label for="node-config-input-port"><i class="fa fa-server"></i> Port</label>
-      <input type="text" id="node-config-input-port">
+      <input type="text" id="node-config-input-port" placeholder="May not be required e.g 8080">
     </div>
     <div class="form-row">
       <label for="node-config-input-path"><i class="fa fa-folder"></i> Path</label>
-      <input type="text" id="node-config-input-path">
+      <input type="text" id="node-config-input-path" placeholder="May not be required e.g /socket.io/">
+    </div>
+    <div class="form-row">
+      <label for="node-config-input-token"><i class="fa fa-key"></i> JWT Token</label>
+      <textarea type="text" id="node-config-input-token" style="width: 70%;height: 100px;"></textarea>
     </div>
   </script>
 
@@ -48,7 +57,7 @@
   <script type="text/javascript">
     /*global RED*/
     RED.nodes.registerType('socketio-connector', {
-      category: 'input',
+      category: 'socket io client',
       inputs: 0,
       outputs: 1,
       color: "#D8BFD8",
@@ -57,7 +66,7 @@
       defaults: {
         server: {
           value: "",
-          type: "socketio-config"
+          type: "socketio-client-config"
         },
         namespace: {
           value: "",
@@ -103,7 +112,7 @@
   <script type="text/javascript">
     /*global RED*/
     RED.nodes.registerType('socketio-listener', {
-      category: 'function',
+      category: 'socket io client',
       inputs: 1,
       outputs: 1,
       color: "#D8BFD8",
@@ -142,11 +151,102 @@
       <p>The <code>msg.payload</code> will be whole content emitted through 'event name' that you specified</p>
   </script>
 
+
+<!-- Listener In -->
+<script type="text/javascript">
+  /*global RED*/
+  RED.nodes.registerType('socketio-listener-in', {
+    category: 'socket io client',
+    inputs: 1,
+    outputs: 1,
+    color: "#8cb7c5",
+    icon: "socketio.png",
+    paletteLabel: "socketio listener in",
+    defaults: {
+      eventname: {
+        value: "",
+        required: true
+      },
+      name: {
+        value: ""
+      }
+    },
+    label: function() {
+        return ( this.name || this.eventname ) || "Socket.IO listener in";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="socketio-listener-in">
+  <div class="form-row">
+    <label for="node-input-eventname"><i class="icon-tasks"></i> Event Name</label>
+    <input type="text" id="node-input-eventname" placeholder="Event Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="socketio-listener-in">
+    <p>Socket.IO Listener In</p>
+    <p>It's works only in couple with Socket.io Connector</p>
+    <pre>Socket.IO Connector -> Socket.IO Listener In -> Payload -> Socket.IO Listener Callback Out</pre>
+</script>
+
+
+<!-- Listener Callback Out -->
+<script type="text/javascript">
+  /*global RED*/
+  RED.nodes.registerType('socketio-listener-out', {
+    category: 'socket io client',
+    inputs: 1,
+    outputs: 0,
+    color: "#8cb7c5",
+    icon: "socketio.png",
+    paletteLabel: "socketio listener out",
+    defaults: {
+      eventname: {
+        value: "",
+        required: true
+      },
+      name: {
+        value: ""
+      }
+    },
+    label: function() {
+        return ( this.name || this.eventname ) || "Socket.IO listener out";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="socketio-listener-out">
+  <div class="form-row">
+    <label for="node-input-eventname"><i class="icon-tasks"></i> Event Name</label>
+    <input type="text" id="node-input-eventname" placeholder="Event Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="socketio-listener-out">
+    <p>Socket.IO Listener Callback Out</p>
+    <p>It's works only in couple with Socket.io Connector and listener In</p>
+    <pre>Socket.IO Connector -> Socket.IO Listener In -> Payload -> Socket.IO Listener Out</pre>
+    <code>msg.callback: "your message or object";</code>
+
+  msg.callback
+
+  </script>
+
+
 <!-- Emitter -->
   <script type="text/javascript">
     /*global RED*/
     RED.nodes.registerType('socketio-emitter', {
-      category: 'function',
+      category: 'socket io client',
       inputs: 1,
       outputs: 0,
       color: "#D8BFD8",
@@ -185,3 +285,51 @@
       </pre>
   </script>
 
+  
+<!-- Emitter with callback -->
+<script type="text/javascript">
+  /*global RED*/
+  RED.nodes.registerType('socketio-callback-emitter', {
+    category: 'socket io client',
+    inputs: 1,
+    outputs: 1,
+    color: "#8cb7c5",
+    icon: "socketio.png",
+    paletteLabel: "socketio callback emitter",
+    defaults: {
+      name: {
+        value: "",
+        required: true
+      },
+      connection: {
+        value: "",
+        required: true
+      }
+    },
+    label: function() {
+        return ( this.name ) || "Socket.IO callback emitter";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="socketio-callback-emitter">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tasks"></i> Event Name</label>
+    <input type="text" id="node-input-name" placeholder="Event Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-connection"><i class="icon-tasks"></i> Connection Name</label>
+    <input type="text" id="node-input-connection" placeholder="Connection Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="socketio-callback-emitter">
+    <p>Socket.IO callback emitter</p>
+    <p>Use payload as what you want to send</p>
+    <pre>
+        payload: {
+          cmd: 'hello',
+          message: 'World'
+        }
+    </pre>
+</script>

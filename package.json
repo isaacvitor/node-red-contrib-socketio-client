@@ -1,7 +1,7 @@
 {
   "name": "node-red-contrib-socketio-client",
-  "version": "0.4.0",
-  "description": "Node Red client to work with socket.io server",
+  "version": "0.4.9",
+  "description": "Node Red client to work with socket.io server with JWT option",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,11 +21,15 @@
   },
   "homepage": "https://github.com/isaacvitor/node-red-contrib-socketio-client.git#readme",
   "dependencies": {
-    "socket.io-client": "^2.3.0"
+    "socket.io-client": "^4.6.1"
   },
   "node-red": {
+    "version": ">=2.0.0",
     "nodes": {
       "socketio-client": "socketio-client/socketio-client.js"
     }
+  },
+  "engines": {
+    "node": ">=12.0.0"
   }
 }
